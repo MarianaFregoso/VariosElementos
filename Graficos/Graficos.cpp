@@ -29,6 +29,10 @@ vector<Vertice> cuadrado;
 GLuint VertesArrayCuadradoID;
 GLuint buffercuadradoID;
 
+vector<Vertice> circulo;
+GLuint vertexArrayCirculoID;
+GLuint bufferCirculoID;
+
 Shader *shader;
 
 void actualizar() { 
@@ -46,6 +50,9 @@ void dibujar() {
 
 	glBindVertexArray(VertesArrayCuadradoID);
 	glDrawArrays(GL_POLYGON, 0, cuadrado.size());
+
+	glBindVertexArray(vertexArrayCirculoID);
+	glDrawArrays(GL_POLYGON, 0, circulo.size());
 	//soltar el vertex array
 	glBindVertexArray(0);
 	//soltar el shader
@@ -80,6 +87,19 @@ void inicializarCuadrado() {
 	cuadrado.push_back(v2);
 	cuadrado.push_back(v3);
 	cuadrado.push_back(v4);
+}
+
+void inicializarCirculo() {
+
+	Vertice verticeCirculo[360];
+	for (int i = 0; i < 360; i++) {
+		verticeCirculo[i] =
+		{
+			vec3(0.2*cos(i)*1.9 , 0.2*sin(i)*2.5, 0.0f),
+			vec4(0.0f,0.0f,1.0f,0.0f)
+		};
+		circulo.push_back(verticeCirculo[i]);
+	}
 }
 
 int main()
@@ -124,10 +144,11 @@ int main()
 	cout << "Version de OpenGL: " << version << endl;
 
 
-	red = green = blue = 0.0f;
+	red = green = blue = 0.5f;
 
 	inicializarTriangulo();
 	inicializarCuadrado();
+	inicializarCirculo();
 
 
 	//crear instancia del shader
@@ -178,6 +199,19 @@ int main()
 	glEnableVertexAttribArray(colorID);
 	glVertexAttribPointer(posicionID, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
 	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void*) sizeof(vec3));
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//Instrucciones para el circulo
+	glGenVertexArrays(1, &vertexArrayCirculoID);
+	glBindVertexArray(vertexArrayCirculoID);
+	glGenBuffers(1, &bufferCirculoID);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferCirculoID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertice) * circulo.size(), circulo.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(posicionID);
+	glEnableVertexAttribArray(colorID);
+	glVertexAttribPointer(posicionID, 3, GL_FLOAT, GL_FALSE, sizeof(Vertice), 0);
+	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE, sizeof(Vertice), (void*)sizeof(vec3));
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
